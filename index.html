@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FURIA Round Timer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main id="main-container">
+        <!-- Navbar simplificada -->
+        <nav>
+            <h1><img src="https://furiagg.fbitsstatic.net/sf/img/logo-furia.svg?theme=main&v=202503171541" alt="Logo FURIA" srcset=""></h1>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container">
+            <!-- Timer Title -->
+            <div class="title">
+                <h2>Round Timer</h2>
+                <div class="divider"></div>
+            </div>
+
+            <!-- Status de carregamento de áudio -->
+            <div id="loading-audio" class="loading-audio">Carregando efeitos sonoros...</div>
+
+            <!-- Cronômetro -->
+            <div class="timer-container">
+                <div id="timer-circle" class="timer-circle">
+                    <div id="timer" class="timer">01:55</div>
+                </div>
+            </div>
+
+            <!-- Botões de Controle -->
+            <div class="controls">
+                <button id="start-btn" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Iniciar
+                </button>
+
+                <button id="pause-btn" class="btn btn-secondary" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="6" y="4" width="4" height="16"></rect>
+                        <rect x="14" y="4" width="4" height="16"></rect>
+                    </svg>
+                    Pausar
+                </button>
+
+                <button id="reset-btn" class="btn btn-tertiary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                    </svg>
+                    Resetar
+                </button>
+
+                <button id="fast-forward-btn" class="btn btn-tertiary" title="Pular para os últimos 10 segundos">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 19 22 12 13 5 13 19"></polygon>
+                        <polygon points="2 19 11 12 2 5 2 19"></polygon>
+                    </svg>
+                    Acelerar
+                </button>
+
+                <button id="sound-btn" class="btn btn-tertiary">
+                    <svg id="sound-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Painel de Frases Motivacionais -->
+            <div class="motivation-panel">
+                <h3>Motivação FURIA</h3>
+                <div class="motivation-content">
+                    <p id="motivation-text">"RUSH B!"</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Criado por um verdadeiro fã da FURIA</p>
+        </footer>
+
+        <!-- Elementos de áudio -->
+        <audio id="audio-round-start" src="round-start.mp3" preload="auto"></audio>
+        <audio id="audio-round-end" src="round-end.mp3" preload="auto"></audio>
+        <audio id="audio-bomb-tick" src="bomb-tick.mp3" preload="auto"></audio>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

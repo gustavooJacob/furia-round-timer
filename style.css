@@ -1,0 +1,291 @@
+/* Reset e estilos base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    color: #000;
+    background: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: background-color 0.3s ease;
+}
+
+/* Navbar */
+nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0rem;
+    border-bottom: 1px solid #e5e5e5;
+    background-color: #fff;
+    position: relative;
+    z-index: 10;
+}
+
+nav h1 img {
+    width: 4rem;
+    height: 4rem;
+    margin-right: 0.5rem;
+    
+}
+
+/* Container principal */
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 5;
+}
+
+/* Título */
+.title {
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.title h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 0.5rem;
+}
+
+.divider {
+    width: 4rem;
+    height: 2px;
+    background-color: #000;
+    margin: 0 auto;
+}
+
+/* Status de carregamento de áudio */
+.loading-audio {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 1rem;
+    display: none;
+}
+
+/* Cronômetro */
+.timer-container {
+    position: relative;
+    margin-bottom: 3rem;
+}
+
+.timer-circle {
+    width: 16rem;
+    height: 16rem;
+    border-radius: 50%;
+    border: 4px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    position: relative;
+    z-index: 2;
+}
+
+.timer {
+    font-size: 4rem;
+    font-weight: 700;
+    font-family: monospace;
+}
+
+/* Animação de pulso para os últimos 10 segundos */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.pulse {
+    animation: pulse 1s infinite;
+}
+
+/* Animação de fundo vermelho pulsante */
+@keyframes redPulse {
+    0% {
+        background-color: #fff;
+    }
+    50% {
+        background-color: rgba(255, 0, 0, 0.579);
+    }
+    100% {
+        background-color: #fff;
+    }
+}
+
+.red-pulse-bg {
+    animation: redPulse 1s infinite;
+}
+
+/* Botões de controle */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 2;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn svg {
+    margin-right: 0.5rem;
+}
+
+.btn-primary {
+    background-color: #000;
+    color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    background-color: #fff;
+    color: #000;
+    border: 2px solid #000;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: #f5f5f5;
+}
+
+.btn-tertiary {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #ccc;
+}
+
+.btn-tertiary:hover:not(:disabled) {
+    background-color: #f5f5f5;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Painel de frases motivacionais */
+.motivation-panel {
+    width: 100%;
+    max-width: 32rem;
+    border: 1px solid #e5e5e5;
+    padding: 1.5rem;
+    background-color: #fff;
+    position: relative;
+    z-index: 2;
+}
+
+.motivation-panel h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+}
+
+.motivation-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 4rem;
+}
+
+.motivation-content p {
+    font-size: 1.5rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Animação de fade in */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Footer */
+footer {
+    padding: 1.5rem;
+    border-top: 1px solid #e5e5e5;
+    text-align: center;
+    background-color: #fff;
+    position: relative;
+    z-index: 10;
+}
+
+footer p {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+/* Responsividade */
+@media (max-width: 640px) {
+    .timer-circle {
+        width: 12rem;
+        height: 12rem;
+    }
+
+    .timer {
+        font-size: 3rem;
+    }
+
+    .controls {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn {
+        width: 100%;
+        max-width: 16rem;
+    }
+}
