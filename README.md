@@ -1,2 +1,3 @@
-# furia-round-timer
- FURIA Round Timer – Inspirado em CS2
+# FURIA Round Timer
+
+FURIA Round Timer – Inspirado em CS2
