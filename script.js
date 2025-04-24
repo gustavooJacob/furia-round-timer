@@ -15,13 +15,105 @@ document.addEventListener('DOMContentLoaded', function() {
     // Elementos de áudio
     const audioRoundStart = document.getElementById('audio-round-start');
     const audioRoundEnd = document.getElementById('audio-round-end');
-    const audioBombTick = document.getElementById('audio-bomb-tick');
+    
+    // Web Audio API
+    let audioContext = null;
+    let tickBuffer = null;
+    let tickSource = null;
+    let tickGainNode = null;
+    let isTickPlaying = false;
+    
+    // Inicializar Web Audio API
+    function initAudioContext() {
+        try {
+            // Criar o contexto de áudio
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Carregar o som de tique-taque
+            loadTickSound();
+            
+            console.log('Audio context initialized');
+        } catch (e) {
+            console.error('Web Audio API não suportada:', e);
+        }
+    }
+    
+    // Carregar o som de tique-taque
+    function loadTickSound() {
+        fetch('assents/10 Second Countdown ⧸ Bomb Countdown.mp3')
+            .then(response => response.arrayBuffer())
+            .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+            .then(audioBuffer => {
+                tickBuffer = audioBuffer;
+                console.log('Tick sound loaded');
+            })
+            .catch(error => console.error('Error loading tick sound:', error));
+    }
+    
+    // Reproduzir o som de tique-taque
+    function playTickSound() {
+        if (!audioContext || !tickBuffer || !soundEnabled || isTickPlaying) return;
+        
+        try {
+            // Parar qualquer som anterior
+            stopTickSound();
+            
+            // Criar uma fonte de áudio
+            tickSource = audioContext.createBufferSource();
+            tickSource.buffer = tickBuffer;
+            
+            // Criar um nó de ganho para controlar o volume
+            tickGainNode = audioContext.createGain();
+            
+            // Ajustar o volume com base no tempo restante
+            const volume = Math.min(1, 0.7 + (10 - time) * 0.03);
+            tickGainNode.gain.value = volume;
+            
+            // Conectar a fonte ao nó de ganho e o nó de ganho à saída
+            tickSource.connect(tickGainNode);
+            tickGainNode.connect(audioContext.destination);
+            
+            // Marcar como tocando
+            isTickPlaying = true;
+            
+            // Configurar o evento de término
+            tickSource.onended = function() {
+                isTickPlaying = false;
+                
+                // Se o timer ainda estiver rodando e abaixo de 10 segundos, tocar novamente
+                if (isRunning && time <= 10 && time > 0) {
+                    setTimeout(() => {
+                        playTickSound();
+                    }, time <= 5 ? 300 : 500);
+                }
+            };
+            
+            // Iniciar a reprodução
+            tickSource.start(0);
+            console.log('Tick sound played with volume:', volume);
+        } catch (e) {
+            console.error('Error playing tick sound:', e);
+            isTickPlaying = false;
+        }
+    }
+    
+    // Parar o som de tique-taque
+    function stopTickSound() {
+        if (!isTickPlaying || !tickSource) return;
+        
+        try {
+            tickSource.stop(0);
+            isTickPlaying = false;
+            console.log('Tick sound stopped');
+        } catch (e) {
+            console.error('Error stopping tick sound:', e);
+        }
+    }
     
     // Variáveis de estado
     let time = 115; // 1:55 em segundos
     let isRunning = false;
     let interval;
-    let tickInterval;
     let soundEnabled = true;
     
     // Frases motivacionais
@@ -40,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Verificar se os áudios estão carregados
     let audiosLoaded = 0;
-    const totalAudios = 3;
+    const totalAudios = 2; // Reduzido para 2 porque o tick agora é carregado pela Web Audio API
     
     function checkAudioLoaded() {
         audiosLoaded++;
@@ -51,7 +143,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     audioRoundStart.addEventListener('canplaythrough', checkAudioLoaded);
     audioRoundEnd.addEventListener('canplaythrough', checkAudioLoaded);
-    audioBombTick.addEventListener('canplaythrough', checkAudioLoaded);
     
     // Mostrar o status de carregamento de áudio
     loadingAudio.style.display = 'block';
@@ -78,20 +169,18 @@ document.addEventListener('DOMContentLoaded', function() {
             // Clonar o áudio para permitir sobreposição de sons
             const audioClone = audio.cloneNode();
             audioClone.volume = volume;
-            audioClone.play().catch(err => {
-                console.error('Erro ao reproduzir som:', err);
-            });
+            
+            // Usar uma Promise para garantir que o som seja reproduzido
+            const playPromise = audioClone.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    console.error('Erro ao reproduzir som:', err);
+                });
+            }
         } catch (err) {
             console.error('Erro ao clonar áudio:', err);
         }
-    }
-    
-    function playBombTickSound() {
-        if (!soundEnabled) return;
-        
-        // Ajustar volume com base no tempo restante - fica mais alto conforme o tempo diminui
-        const volume = Math.min(1, 1 - time / 115 + 0.3);
-        playSound(audioBombTick, volume);
     }
     
     function updateTimer() {
@@ -101,9 +190,23 @@ document.addEventListener('DOMContentLoaded', function() {
         if (time <= 10 && isRunning) {
             timerCircle.classList.add('pulse');
             mainContainer.classList.add('red-pulse-bg'); // Adiciona o fundo vermelho pulsante
+            
+            // Iniciar o som de tique-taque se ainda não estiver tocando
+            if (soundEnabled && !isTickPlaying) {
+                playTickSound();
+            }
+            
+            // Atualizar o volume do som de tique-taque
+            if (tickGainNode && isTickPlaying) {
+                const volume = Math.min(1, 0.7 + (10 - time) * 0.03);
+                tickGainNode.gain.value = volume;
+            }
         } else {
             timerCircle.classList.remove('pulse');
             mainContainer.classList.remove('red-pulse-bg'); // Remove o fundo vermelho pulsante
+            
+            // Parar o som de tique-taque
+            stopTickSound();
         }
         
         // Atualizar estado do botão de avanço rápido
@@ -118,6 +221,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function startTimer() {
         if (isRunning) return;
+        
+        // Inicializar o contexto de áudio se necessário
+        if (!audioContext) {
+            initAudioContext();
+        } else if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
         
         if (time > 0) {
             isRunning = true;
@@ -137,23 +247,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }, 1000);
             
-            // Iniciar o som de tique-taque nos últimos 10 segundos
-            checkTickSound();
+            // Verificar se já devemos iniciar o som de tique-taque
+            if (time <= 10 && time > 0 && soundEnabled) {
+                playTickSound();
+            }
             
             // Atualizar estado do botão de avanço rápido
             updateFastForwardButton();
         } else {
             resetTimer();
             startTimer();
-        }
-    }
-    
-    function checkTickSound() {
-        clearInterval(tickInterval);
-        
-        if (isRunning && time <= 10) {
-            const interval = time <= 5 ? 300 : 500;
-            tickInterval = setInterval(playBombTickSound, interval);
         }
     }
     
@@ -165,7 +268,9 @@ document.addEventListener('DOMContentLoaded', function() {
         pauseBtn.disabled = true;
         
         clearInterval(interval);
-        clearInterval(tickInterval);
+        
+        // Parar o som de tique-taque
+        stopTickSound();
         
         // Remover efeitos visuais quando pausado
         if (time <= 10) {
@@ -182,7 +287,9 @@ document.addEventListener('DOMContentLoaded', function() {
         pauseBtn.disabled = true;
         
         clearInterval(interval);
-        clearInterval(tickInterval);
+        
+        // Parar o som de tique-taque
+        stopTickSound();
         
         // Remover efeitos visuais quando parado
         timerCircle.classList.remove('pulse');
@@ -205,9 +312,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Avança para 10 segundos
             time = 10;
             updateTimer();
-            
-            // Inicia o som de tique-taque
-            checkTickSound();
         }
     }
     
@@ -220,12 +324,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
                 <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
             `;
+            
+            // Reiniciar o som de tique-taque se necessário
+            if (isRunning && time <= 10 && time > 0) {
+                playTickSound();
+            }
         } else {
             soundIcon.innerHTML = `
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
                 <line x1="23" y1="9" x2="17" y2="15"></line>
                 <line x1="17" y1="9" x2="23" y2="15"></line>
             `;
+            
+            // Parar o som de tique-taque
+            stopTickSound();
+        }
+    }
+    
+    // Função para testar o som de tique-taque
+    function testTickSound() {
+        console.log('Testing tick sound...');
+        
+        // Inicializar o contexto de áudio se necessário
+        if (!audioContext) {
+            initAudioContext();
+            
+            // Dar tempo para o buffer carregar
+            setTimeout(() => {
+                playTickSound();
+            }, 500);
+        } else {
+            playTickSound();
         }
     }
     
@@ -236,9 +365,21 @@ document.addEventListener('DOMContentLoaded', function() {
     fastForwardBtn.addEventListener('click', fastForward);
     soundBtn.addEventListener('click', toggleSound);
     
+    // Adicionar um event listener para testar o som com um clique no timer
+    timerCircle.addEventListener('click', testTickSound);
+    
     // Inicialização
     updateTimer();
     changePhrase();
     pauseBtn.disabled = true;
     fastForwardBtn.disabled = true; // Inicialmente desativado
+    
+    // Inicializar o contexto de áudio quando a página carregar
+    // Isso deve ser feito em resposta a uma interação do usuário em alguns navegadores
+    document.addEventListener('click', function initAudioOnFirstClick() {
+        if (!audioContext) {
+            initAudioContext();
+            document.removeEventListener('click', initAudioOnFirstClick);
+        }
+    });
 });
